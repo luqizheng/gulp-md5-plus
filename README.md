@@ -4,31 +4,24 @@ it fork from gulp-md5-plus(https://github.com/wpfpizicai/gulp-md5-plus)
 
 > md5 plugin for [gulp](https://github.com/wpfpizicai/gulp-md5-plus) ,md5 the static files(eg javascript style image files) ;then replace the filenames in css or the html if needed by passing the file or dir in the second parameter
 
-src 
+
+
+```html
 <script src="/js/a.js"></scripts>
-
-asume md5 is 223b3932
-
 gulp-md5-plus
-<pre>
 <script src="/js/a_223b3932.js"></scripts>
-</pre>
-
 gulp-md5-plus-always.
-<pre>
 <script src="/js/a.js?v=223b3932.js"></scripts>
-</pre>
+```
 
-if a.js is changed and md5 is 12f3243
+if a.js is changed and newer md5 is 12f3243
+
+```html
 gulp-md5-plus do not change the output.
-<pre>
 <script src="/js/a_223b3932.js"></scripts>
-</pre>
-
 gulp-md5-plus-always will change it again
-<pre>
 <script src="/js/a.js?v=12f3243.js"></scripts>
-</pre>
+```
 
 
 ## Usage
