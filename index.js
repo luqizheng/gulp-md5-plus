@@ -29,52 +29,19 @@ module.exports = function (size, ifile) {
         } else {
             dir = file.path;
         }
-        dir = path.dirname(dir);
-
-        var md5_filename = filename.split('.').map(function (item, i, arr) {
-            return i == arr.length - 2 ? item + '_' + d : item;
-        }).join('.');
-
+        dir = path.dirname(dir);        
+        var md5_filename = filename + "?v=" + d;
         console.log(md5_filename);
 
         if (Object.prototype.toString.call(ifile) == "[object Array]") {
             ifile.forEach(function (i_ifile) {
-                i_ifile && glob(i_ifile, function (err, i_files) {
-                    if (err) return console.log(err);
-                    i_files.forEach(function (i_ilist) {
-                        var ary = filename.split('.');
-                        var ext = ary.pop();
-                        var md5FileName = ary.join('.');
-                        var regexd = '(/' + filename + '[^a-zA-Z_0-9].*?)|' + '(/' + md5FileName + '_[a-zA-Z_0-9]+.' + ext + '?)'                        
-                        var result = fs.readFileSync(i_ilist, 'utf8').replace(new RegExp(regexd, "g"), function (sfile_name) {                            
-                            return sfile_name.replace(sfile_name, '/'+md5_filename)
-                        });
-                        fs.writeFileSync(i_ilist, result, 'utf8');
-                    })
-                })
+                replaceIncludeFile(i_ifile, md5_filename, filename);                
             })
         } else {
-            ifile && glob(ifile, function (err, files) {
-                if (err) return console.log(err);
-                files.forEach(function (ilist) {
-                    /*var result = fs.readFileSync(ilist, 'utf8').replace(new RegExp('/' + filename + '[^a-zA-Z_0-9].*?', "g"), function (sfile_name) {                        
-                        return sfile_name.replace(filename, md5_filename)
-                    });
-                    fs.writeFileSync(ilist, result, 'utf8');*/
-
-                    var ary = filename.split('.');
-                    var ext = ary.pop();
-                    var md5FileName = ary.join('.');
-                    var regexd = '(/' + filename + '[^a-zA-Z_0-9].*?)|' + '(/' + md5FileName + '_[a-zA-Z_0-9]+.' + ext + '?)'
-                    var result = fs.readFileSync(i_ilist, 'utf8').replace(new RegExp(regexd, "g"), function (sfile_name) {
-                        return sfile_name.replace("/" + sfile_name, '/'+md5_filename)
-                    });
-                    fs.writeFileSync(i_ilist, result, 'utf8');
-                })
-            })
+            replaceIncludeFile(i_ifile, md5_filename, filename);            
         }
 
-        file.path = path.join(dir, md5_filename);
+        file.path = path.join(dir, filename);
 
         this.push(file);
         cb();
@@ -82,6 +49,20 @@ module.exports = function (size, ifile) {
         cb();
     });
 };
+
+
+function replaceIncludeFile(i_ifile, md5_filename, filename) {
+    i_ifile && glob(i_ifile, function (err, i_files) {
+        if (err) return console.log(err);
+        i_files.forEach(function (i_ilist) {
+            var regexd = filename + "(\\?v=[a-zA-Z_0-9]*){0,1}";
+            var result = fs.readFileSync(i_ilist, 'utf8').replace(new RegExp(regexd, "g"), function (sfile_name) {
+                return sfile_name.replace(sfile_name, md5_filename)
+            });
+            fs.writeFileSync(i_ilist, result, 'utf8');
+        })
+    })
+}
 
 
 function calcMd5(file, slice) {
